@@ -19,10 +19,7 @@ limitations under the License.
 
 ************************************************************************************/
 
-// Use the Unity new GUI with Unity 4.6 or above.
-#if UNITY_4_6 || UNITY_5_0
-#define USE_NEW_GUI
-#endif
+// #define USE_NEW_GUI // You can use Unity new GUI if you have Unity 4.6 or above.
 
 using UnityEngine;
 #if USE_NEW_GUI

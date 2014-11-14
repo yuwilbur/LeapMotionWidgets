@@ -97,6 +97,7 @@ public class OVRTracker
 			if (value)
 				trackingCaps |= (uint)TrackingCaps.Position;
 
+			OVRManager.capiHmd.RecenterPose();
 			OVRManager.capiHmd.ConfigureTracking(trackingCaps, 0);
 #endif
 		}

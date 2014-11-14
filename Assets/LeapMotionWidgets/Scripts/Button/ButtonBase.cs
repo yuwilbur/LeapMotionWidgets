@@ -69,7 +69,7 @@ namespace VRWidgets
       }
       else if (is_pressed_ == true)
       {
-        if (transform.localPosition.z < (triggerDistance + cushionThickness))
+        if (transform.localPosition.z < (triggerDistance - cushionThickness))
         {
           is_pressed_ = false;
           ButtonReleased();

@@ -13,7 +13,7 @@ namespace VRWidgets
     public abstract void ButtonTurnsOn();
     public abstract void ButtonTurnsOff();
 
-    public override void ButtonReleased() 
+    public override void ButtonReleased()
     {
     }
 
@@ -23,13 +23,13 @@ namespace VRWidgets
       {
         ButtonTurnsOn();
         SetMinDistance(onDistance);
-        toggle_state_ = true;
+        toggle_state_ = !toggle_state_;
       } 
       else
       {
         ButtonTurnsOff();
         SetMinDistance(offDistance);
-        toggle_state_ = false;
+        toggle_state_ = !toggle_state_;
       }
     }
 

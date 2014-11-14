@@ -1,36 +1,39 @@
 ﻿using UnityEngine;
 using System.Collections;
-using VRWidgets;
 
-[RequireComponent (typeof (BoxCollider))]
-public class HandDetector : MonoBehaviour
+namespace VRWidgets
 {
-  [HideInInspector]
-  public GameObject target = null;
-
-  private bool IsHand(Collider other)
+  [RequireComponent(typeof(BoxCollider))]
+  public class HandDetector : MonoBehaviour
   {
-    return other.transform.parent && other.transform.parent.parent && other.transform.parent.parent.GetComponent<HandModel>();
-  }
+    [HideInInspector]
+    public GameObject target = null;
 
-  public void ResetTarget()
-  {
-    target = null;
-  }
-
-  void OnTriggerEnter(Collider other)
-  {
-    if (target != null)
-      return;
-
-    if (IsHand(other))
+    private bool IsHand(Collider other)
     {
-      target = other.gameObject;
+      return other.transform.parent && other.transform.parent.parent && other.transform.parent.parent.GetComponent<HandModel>();
+    }
+
+    public void ResetTarget()
+    {
+      target = null;
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+      if (target != null)
+        return;
+
+      if (IsHand(other))
+      {
+        target = other.gameObject;
+      }
+    }
+
+    void Awake()
+    {
+      GetComponent<BoxCollider>().isTrigger = true;
     }
   }
-
-  void Awake()
-  {
-    GetComponent<BoxCollider>().isTrigger = true;
-  }
 }
+
