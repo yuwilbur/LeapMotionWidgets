@@ -1,4 +1,4 @@
-#VR Widgets
+#Leap Motion Widgets
 There are 3 widgets in this package you can use:
 
 1. Buttons
