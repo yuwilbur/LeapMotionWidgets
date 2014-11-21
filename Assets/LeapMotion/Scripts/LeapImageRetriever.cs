@@ -63,6 +63,8 @@ public class LeapImageRetriever : MonoBehaviour
   public const int DEFAULT_DISTORTION_HEIGHT = 64;
   public const int IMAGE_WARNING_WAIT = 10;
 
+  private bool init_ = true;
+
   public int imageIndex = 0;
   public Color imageColor = Color.white;
   public float gammaCorrection = 1.0f;
@@ -135,13 +137,12 @@ public class LeapImageRetriever : MonoBehaviour
 
     SetMainTextureDimensions();
     SetDistortionDimensions(DEFAULT_DISTORTION_WIDTH, DEFAULT_DISTORTION_HEIGHT);
-  }
 
-  void Update()
-  {
-    if (undistortImage) 
+    //if (undistortImage)
+    if (true)
     {
-      switch (attached_device_.type) {
+      switch (attached_device_.type)
+      {
         case LM_DEVICE.PERIPHERAL:
           renderer.material = new Material(Shader.Find(IR_UNDISTORT_SHADER));
           break;
@@ -168,6 +169,10 @@ public class LeapImageRetriever : MonoBehaviour
           break;
       }
     }
+  }
+
+  void Update()
+  {
 
     Frame frame = leap_controller_.Frame();
 
@@ -186,7 +191,11 @@ public class LeapImageRetriever : MonoBehaviour
 
     // Check main texture dimensions.
     Image image = frame.Images[imageIndex];
-    attached_device_ = new LMDevice(SetDevice(image.Width, image.Height));
+
+    if (init_)
+    {
+      attached_device_ = new LMDevice(SetDevice(image.Width, image.Height));
+    }
 
     if (attached_device_.width == 0 || attached_device_.height == 0)
     {
@@ -194,29 +203,42 @@ public class LeapImageRetriever : MonoBehaviour
       return;
     }
 
-    if (attached_device_.width != main_texture_.width || attached_device_.height != main_texture_.height)
+    if (attached_device_.width != main_texture_.width || attached_device_.height != main_texture_.height) {
+      attached_device_ = new LMDevice(SetDevice(image.Width, image.Height));
       SetMainTextureDimensions();
-
-    // Check distortion texture dimensions.
-    // Divide by two 2 because there are floats per pixel.
-    int distortion_width = image.DistortionWidth / 2;
-    int distortion_height = image.DistortionHeight;
-    if (distortion_width == 0 || distortion_height == 0)
-    {
-      Debug.LogWarning("No data in the distortion texture.");
-      return;
     }
 
-    if (distortion_width != distortionX_.width || distortion_height != distortionX_.height)
-      SetDistortionDimensions(distortion_width, distortion_height);
+    if (init_)
+    {
+      // Check distortion texture dimensions.
+      // Divide by two 2 because there are floats per pixel.
+      int distortion_width = image.DistortionWidth / 2;
+      int distortion_height = image.DistortionHeight;
+      if (distortion_width == 0 || distortion_height == 0)
+      {
+        Debug.LogWarning("No data in the distortion texture.");
+        return;
+      }
+
+      if (distortion_width != distortionX_.width || distortion_height != distortionX_.height)
+        SetDistortionDimensions(distortion_width, distortion_height);
+    }
 
     // Load image texture data.
     image_data_ = image.Data;
-    distortion_data_ = image.Distortion;
+
+    if (init_)
+    {
+      distortion_data_ = image.Distortion;
+    }
 
     LoadMainTexture();
-    if (undistortImage)
-      EncodeDistortion();
+    
+    if (init_)
+    {
+      if (undistortImage)
+        EncodeDistortion();
+    }
     ApplyDataToTextures();
 
     renderer.material.mainTexture = main_texture_;
@@ -224,7 +246,6 @@ public class LeapImageRetriever : MonoBehaviour
     renderer.material.SetInt("_DeviceType", Convert.ToInt32(attached_device_.type));
     renderer.material.SetFloat("_GammaCorrection", gammaCorrection);
     renderer.material.SetInt("_BlackIsTransparent", blackIsTransparent ? 1 : 0);
-
     if (undistortImage)
     {
       renderer.material.SetTexture("_DistortX", distortionX_);
@@ -235,6 +256,7 @@ public class LeapImageRetriever : MonoBehaviour
       renderer.material.SetFloat("_RayScaleX", image.RayScaleX);
       renderer.material.SetFloat("_RayScaleY", image.RayScaleY);
     }
+    init_ = false;
   }
 
   protected void LoadMainTexture()
@@ -312,10 +334,12 @@ public class LeapImageRetriever : MonoBehaviour
   {
     main_texture_.SetPixels32(image_pixels_);
     main_texture_.Apply();
-
-    distortionX_.SetPixels32(dist_pixelsX_);
-    distortionX_.Apply();
-    distortionY_.SetPixels32(dist_pixelsY_);
-    distortionY_.Apply();
+    if (init_)
+    {
+      distortionX_.SetPixels32(dist_pixelsX_);
+      distortionX_.Apply();
+      distortionY_.SetPixels32(dist_pixelsY_);
+      distortionY_.Apply();
+    }
   }
 }
